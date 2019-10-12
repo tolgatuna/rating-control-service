@@ -18,7 +18,7 @@ basePath: /rating-control
 produces:
   - application/json
 paths:
-  '/rlc/book/v1/read/eligibility/{control_level}/{book_id}':
+  '/rcl/book/v1/read/eligibility/{control_level}/{book_id}':
     get:
       responses:
         200:

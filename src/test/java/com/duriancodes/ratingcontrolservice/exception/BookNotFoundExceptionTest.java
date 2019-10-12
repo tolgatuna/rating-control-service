@@ -6,7 +6,7 @@ import org.junit.rules.ExpectedException;
 
 public class BookNotFoundExceptionTest {
     @Rule
-    private ExpectedException expectedException = ExpectedException.none();
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void shouldThrowBookNotFoundExceptionWithMessage_whenBookIsNotFound() {

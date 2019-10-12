@@ -35,7 +35,7 @@ public class RatingControlLevelStepDefinition implements En {
             HttpEntity httpEntity = new HttpEntity(generateHeader());
             responseEntity = (ResponseEntity<Boolean>) given().headers(generateHeader())
                     .when()
-                    .get("/rlc/book/v1/read/eligibility/" + this.customerSetControlLevel + "/" + bookId);
+                    .get("/rcl/book/v1/read/eligibility/" + this.customerSetControlLevel + "/" + bookId);
         });
 
         Then("^I get decision to read the book$", () -> {
