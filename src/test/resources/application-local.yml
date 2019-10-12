@@ -1,3 +1,9 @@
+server:
+  servlet:
+    context-path: /rating-test-control
 api:
   bookService:
-    endPoint: 'http://localhost:9999/fetch/book/rating/'
+    endPoint: 'http://localhost:${wiremock.server.port}/fetch/book/rating/'
+wiremock:
+  server:
+    port: 9999
