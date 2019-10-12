@@ -44,7 +44,7 @@ public class RatingControlServiceImplTest {
     @Before
     public void setUp() throws Exception {
         when(ratingControlServiceConfig.getBookServiceEndpoint()).thenReturn(VALID_URL_BOOK_SERVICE);
-        ratingControlService = new RatingControlServiceImpl(restTemplate);
+        ratingControlService = new RatingControlServiceImpl(restTemplate, ratingControlServiceConfig);
     }
 
     @Test
