@@ -1,0 +1,21 @@
+{
+  "request": {
+    "url": "/fetch/book/rating/BH1234",
+    "method": "GET",
+    "headers": {
+      "Content-Type": {
+        "equalTo": "application/json"
+      },
+      "Accept": {
+        "equalTo": "application/json"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": "15"
+  }
+}

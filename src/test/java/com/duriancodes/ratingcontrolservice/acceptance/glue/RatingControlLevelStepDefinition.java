@@ -1,7 +1,6 @@
 package com.duriancodes.ratingcontrolservice.acceptance.glue;
 
 import com.duriancodes.ratingcontrolservice.RatingControlServiceApiApplication;
-import com.duriancodes.ratingcontrolservice.acceptance.fixtures.BookServiceFixture;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import io.cucumber.java8.En;
 import io.restassured.http.Header;
@@ -35,7 +34,6 @@ public class RatingControlLevelStepDefinition implements En {
         });
 
         When("^I request to read equal level book (.*)$", (String bookId) -> {
-            BookServiceFixture.stubBookServiceResponseForBook_B1234_Rating12(bookId);
             response = given()
                     .headers(generateHeader())
                     .when()
@@ -51,7 +49,6 @@ public class RatingControlLevelStepDefinition implements En {
         });
 
         When("I request to read higher level book (.*)$", (String bookId) -> {
-            BookServiceFixture.stubBookServiceResponseForBook_BH1234_Rating15(bookId);
             response = given()
                     .headers(generateHeader())
                     .when()
