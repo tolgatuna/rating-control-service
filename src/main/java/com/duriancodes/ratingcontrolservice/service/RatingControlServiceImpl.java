@@ -2,6 +2,8 @@ package com.duriancodes.ratingcontrolservice.service;
 
 import com.duriancodes.ratingcontrolservice.common.RatingLevels;
 import com.duriancodes.ratingcontrolservice.config.RatingControlServiceConfig;
+import com.duriancodes.ratingcontrolservice.exception.BookNotFoundException;
+import com.duriancodes.ratingcontrolservice.exception.TechnicalFailureException;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -11,6 +13,8 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
 
 @Service
 public class RatingControlServiceImpl implements RatingControlService {
@@ -25,18 +29,25 @@ public class RatingControlServiceImpl implements RatingControlService {
 
     @Override
     public boolean canReadBook(String customerRatingControlLevel, String bookId) {
+        Map<String, Integer> ratingCodeLevelMap = RatingLevels.RATING_CODE_LEVEL;
         HttpEntity<?> requestEntity = new HttpEntity<>(getHeaders());
-        Integer customerProvidedRatingControlLevel = Integer.valueOf(customerRatingControlLevel);
-        ResponseEntity<String> responseEntity = restTemplate.exchange(serviceConfig.getBookServiceEndpoint() + bookId,
-                HttpMethod.GET, requestEntity, String.class);
+        Integer customerProvidedRatingControlLevel = ratingCodeLevelMap.get(customerRatingControlLevel);
+        try {
+            ResponseEntity<String> responseEntity = restTemplate.exchange(serviceConfig.getBookServiceEndpoint() + bookId,
+                    HttpMethod.GET, requestEntity, String.class);
 
-        if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {
-            Integer bookRatingControlLevel = RatingLevels.RATING_CODE_LEVEL.get(responseEntity.getBody());
-            if (containsValidRatingControlLevelCodes(bookRatingControlLevel, customerProvidedRatingControlLevel)) {
-                return bookRatingControlLevel <= Integer.parseInt(customerRatingControlLevel);
+            if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {
+                Integer bookRatingControlLevel = ratingCodeLevelMap.get(responseEntity.getBody());
+                if (containsValidRatingControlLevelCodes(bookRatingControlLevel, customerProvidedRatingControlLevel)) {
+                    return bookRatingControlLevel <= customerProvidedRatingControlLevel;
+                }
             }
+            return false;
+        } catch (TechnicalFailureException ex) {
+            return false;
+        } catch (BookNotFoundException notFoundEx) {
+            throw new BookNotFoundException(String.format("Book not found for : {}", bookId));
         }
-        return false;
     }
 
     private MultiValueMap<String, String> getHeaders() {

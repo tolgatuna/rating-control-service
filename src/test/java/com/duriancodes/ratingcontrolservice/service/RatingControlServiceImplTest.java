@@ -1,6 +1,8 @@
 package com.duriancodes.ratingcontrolservice.service;
 
 import com.duriancodes.ratingcontrolservice.config.RatingControlServiceConfig;
+import com.duriancodes.ratingcontrolservice.exception.BookNotFoundException;
+import com.duriancodes.ratingcontrolservice.exception.TechnicalFailureException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -48,10 +51,89 @@ public class RatingControlServiceImplTest {
     }
 
     @Test
-    public void shouldReturnTrue_whenBookCodeLevelReturnAs12_andCustomerProvidedRatingCodeIs12() {
+    public void shouldReturnFalse_whenTechnicalFailureExceptionIsThrownFromBookService() throws Exception {
         when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenThrow(TechnicalFailureException.class);
+
+        assertFalse("Read book eligibility is true", ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_12, TEST_BOOK_ID));
+    }
+
+    @Test(expected = BookNotFoundException.class)
+    public void shouldReturnBookNotFoundException_whenExceptionIsThrownFromBookServiceForBookNotFound() {
+        when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenThrow(BookNotFoundException.class);
+        ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_12, TEST_BOOK_ID);
+    }
+
+    @Test
+    public void shouldReturnTrue_whenBookCodeLevelReturnAsU_andCustomerProvidedRatingCodeIsU() throws Exception {
+        Mockito.when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenReturn(new ResponseEntity<>(BOOK_SERVICE_RATING_LEVEL_CODE_U, HttpStatus.OK));
+
+        assertTrue("Read book eligibility is false",
+                ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_U, TEST_SAMPLE_BOOK_ID));
+    }
+
+    @Test
+    public void shouldReturnTrue_whenBookCodeLevelReturnAsU_andCustomerProvidedRatingCodeIs8() throws Exception {
+        Mockito.when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenReturn(new ResponseEntity<>(BOOK_SERVICE_RATING_LEVEL_CODE_U, HttpStatus.OK));
+
+        assertTrue("Read book eligibility is false",
+                ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_8, TEST_SAMPLE_BOOK_ID));
+    }
+
+    @Test
+    public void shouldReturnTrue_whenBookCodeLevelReturnAs8_andCustomerProvidedRatingCodeIs12() throws Exception {
+        Mockito.when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenReturn(new ResponseEntity<>(BOOK_SERVICE_RATING_LEVEL_CODE_8, HttpStatus.OK));
+
+        assertTrue("Read book eligibility is false",
+                ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_12, TEST_SAMPLE_BOOK_ID));
+    }
+
+    @Test
+    public void shouldReturnTrue_whenBookCodeLevelReturnAs12_andCustomerProvidedRatingCodeIs12() throws Exception {
+        Mockito.when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
                 .thenReturn(new ResponseEntity<>(BOOK_SERVICE_RATING_LEVEL_CODE_12, HttpStatus.OK));
 
-        assertTrue("Read book eligibility is false", ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_12, TEST_BOOK_ID));
+        assertTrue("Read book eligibility is false",
+                ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_12, TEST_BOOK_ID));
+    }
+
+    @Test
+    public void shouldReturnFalse_whenBookCodeLevelReturnAs15_andCustomerProvidedRatingCodeIs12() throws Exception {
+        Mockito.when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenReturn(new ResponseEntity<>(BOOK_SERVICE_RATING_LEVEL_CODE_15, HttpStatus.OK));
+
+        assertFalse("Read book eligibility is false",
+                ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_12, TEST_SAMPLE_BOOK_ID));
+    }
+
+    @Test
+    public void shouldReturnFalse_whenBookCodeLevelReturnAs18_andCustomerProvidedRatingCodeIs12() throws Exception {
+        Mockito.when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenReturn(new ResponseEntity<>(BOOK_SERVICE_RATING_LEVEL_CODE_18, HttpStatus.OK));
+
+        assertFalse("Read book eligibility is false",
+                ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_12, TEST_SAMPLE_BOOK_ID));
+    }
+
+    @Test
+    public void shouldReturnTrue_whenBookCodeLevelReturnAs15_andCustomerProvidedRatingCodeIs18() throws Exception {
+        Mockito.when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenReturn(new ResponseEntity<>(BOOK_SERVICE_RATING_LEVEL_CODE_15, HttpStatus.OK));
+
+        assertTrue("Read book eligibility is false",
+                ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_18, TEST_SAMPLE_BOOK_ID));
+    }
+
+    @Test
+    public void shouldReturnFalse_whenBookCodeLevelReturnAsXX_whichIsUnknown_andCustomerProvidedRatingCodeIs18() throws Exception {
+        Mockito.when(restTemplate.exchange(anyString(), (HttpMethod) any(), (HttpEntity) any(), Mockito.<Class<String>>any()))
+                .thenReturn(new ResponseEntity<>(BOOK_SERVICE_RATING_LEVEL_CODE_XX, HttpStatus.OK));
+
+        assertFalse("Read book eligibility is false",
+                ratingControlService.canReadBook(CUSTOMER_RATING_LEVEL_CODE_18, TEST_SAMPLE_BOOK_ID));
     }
 }
