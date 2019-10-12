@@ -2,6 +2,7 @@ package com.duriancodes.ratingcontrolservice.controller;
 
 import com.duriancodes.ratingcontrolservice.service.RatingControlService;
 import com.tdd.book.swagger.api.RclApi;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,11 +13,8 @@ public class RatingControlLevelController implements RclApi {
     private static final String NUMBER_REGEX = "[0-9]+";
     private static final String NO_SPECIAL_CHAR_REGEX = "[a-zA-Z0-9]*";
 
+    @Autowired
     private RatingControlService ratingControlService;
-
-    public RatingControlLevelController(RatingControlService ratingControlService) {
-        this.ratingControlService = ratingControlService;
-    }
 
     @Override
     public ResponseEntity<Boolean> getControlAccess(String controlLevel, String bookId) {
@@ -24,7 +22,7 @@ public class RatingControlLevelController implements RclApi {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         boolean canReadBook = ratingControlService.canReadBook(controlLevel, bookId);
-        return new ResponseEntity<Boolean>(canReadBook, HttpStatus.OK);
+        return new ResponseEntity<>(canReadBook, HttpStatus.OK);
     }
 
     public boolean isValidControlLevel(String controlLevel) {

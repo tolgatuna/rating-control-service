@@ -37,7 +37,6 @@ public class RatingControlLevelControllerIT {
                 .accept("application/json"))
                 .andExpect(status().isOk())
                 .andExpect(content().string("true"));
-
     }
 
     @Test

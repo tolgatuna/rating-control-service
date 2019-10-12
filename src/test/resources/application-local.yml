@@ -1,0 +1,3 @@
+api:
+  bookService:
+    endPoint: 'http://localhost:9999/fetch/book/rating/'

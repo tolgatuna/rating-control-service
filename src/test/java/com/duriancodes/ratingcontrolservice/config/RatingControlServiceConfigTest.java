@@ -12,7 +12,7 @@ import static org.springframework.test.util.AssertionErrors.assertNotNull;
 @SpringBootTest
 @RunWith(SpringRunner.class)
 public class RatingControlServiceConfigTest {
-    private static final String BOOK_SERVICE_URL = "https://my-third-party.service.com/fetch/book/";
+    private static final String BOOK_SERVICE_URL = "https://my-third-party.service.com/fetch/book/rating/";
 
     @Autowired
     private RatingControlServiceConfig ratingControlServiceConfig;

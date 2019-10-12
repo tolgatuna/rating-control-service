@@ -30,11 +30,14 @@ public class RatingControlServiceImpl implements RatingControlService {
     @Override
     public boolean canReadBook(String customerRatingControlLevel, String bookId) {
         Map<String, Integer> ratingCodeLevelMap = RatingLevels.RATING_CODE_LEVEL;
-        HttpEntity<?> requestEntity = new HttpEntity<>(getHeaders());
         Integer customerProvidedRatingControlLevel = ratingCodeLevelMap.get(customerRatingControlLevel);
+        HttpEntity<?> requestEntity = new HttpEntity<>(getHeaders());
         try {
-            ResponseEntity<String> responseEntity = restTemplate.exchange(serviceConfig.getBookServiceEndpoint() + bookId,
-                    HttpMethod.GET, requestEntity, String.class);
+            ResponseEntity<String> responseEntity = restTemplate.exchange(
+                    serviceConfig.getBookServiceEndpoint() + bookId,
+                    HttpMethod.GET,
+                    requestEntity,
+                    String.class);
 
             if (HttpStatus.OK.equals(responseEntity.getStatusCode())) {
                 Integer bookRatingControlLevel = ratingCodeLevelMap.get(responseEntity.getBody());
@@ -46,7 +49,7 @@ public class RatingControlServiceImpl implements RatingControlService {
         } catch (TechnicalFailureException ex) {
             return false;
         } catch (BookNotFoundException notFoundEx) {
-            throw new BookNotFoundException(String.format("Book not found for : {}", bookId));
+            throw new BookNotFoundException(String.format("Book not found for : %s", bookId));
         }
     }
 
